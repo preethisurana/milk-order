@@ -154,6 +154,38 @@
         </div>
       </div>
     </section>
+
+    <section class="rules-section">
+      <div class="section-heading">
+        <p class="eyebrow">Generate bills</p>
+        <h2>Email a customer bill to owner</h2>
+      </div>
+
+      <form class="bill-form" id="bill-generator-form">
+        <div class="field">
+          <label for="bill-customer-id">Customer</label>
+          <select id="bill-customer-id" name="customerId" required>
+            <option value="">Select customer</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="bill-start-date">Start date</label>
+          <input id="bill-start-date" name="startDate" type="date" required />
+        </div>
+
+        <div class="field">
+          <label for="bill-end-date">End date</label>
+          <input id="bill-end-date" name="endDate" type="date" required />
+        </div>
+
+        <div class="action-row">
+          <button class="primary-button" type="submit">Generate bill</button>
+        </div>
+
+        <p class="form-message" id="bill-message" role="status"></p>
+      </form>
+    </section>
   </main>
   <script src="app-config.js"></script>
   <script src="script.js"></script>

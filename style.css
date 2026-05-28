@@ -473,6 +473,18 @@ select:focus {
   gap: 16px;
 }
 
+.bill-form {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.bill-form .action-row,
+.bill-form .form-message {
+  grid-column: 1 / -1;
+}
+
 .customer-form .action-row,
 .customer-form .form-message {
   grid-column: 1 / -1;
@@ -500,6 +512,7 @@ select:focus {
 
   .order-grid,
   .customer-form,
+  .bill-form,
   .rules-list {
     grid-template-columns: 1fr;
   }

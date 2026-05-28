@@ -63,6 +63,10 @@ function doPost(e) {
       return jsonResponse_(deleteCustomer_(payload));
     }
 
+    if (action === "generateCustomerBill") {
+      return jsonResponse_(generateCustomerBill_(payload));
+    }
+
     return jsonResponse_({
       success: false,
       message: "Unknown action.",
@@ -427,6 +431,83 @@ function deleteCustomer_(payload) {
   return {
     success: true,
     message: "Customer deactivated.",
+  };
+}
+
+function generateCustomerBill_(payload) {
+  requireSession_(payload.token, "owner");
+  const customerId = String(payload.customerId || "").trim();
+  const startDate = String(payload.startDate || "").trim();
+  const endDate = String(payload.endDate || "").trim();
+
+  if (!customerId || !isDateKey_(startDate) || !isDateKey_(endDate)) {
+    return {
+      success: false,
+      message: "Customer, start date, and end date are required.",
+    };
+  }
+
+  if (startDate > endDate) {
+    return {
+      success: false,
+      message: "Start date must be before end date.",
+    };
+  }
+
+  const customer = findRowByValue_(CONFIG.sheets.customers, "customerId", customerId);
+
+  if (!customer || !isActive_(customer.data.active)) {
+    return {
+      success: false,
+      message: "Active customer not found.",
+    };
+  }
+
+  const orders = readRows_(CONFIG.sheets.orders)
+    .rows
+    .map((row) => row.data)
+    .filter((order) => order.customerId === customerId)
+    .filter((order) => order.status !== "DELETED")
+    .filter((order) => {
+      const orderDate = dateKey_(order.orderDate);
+      return orderDate >= startDate && orderDate <= endDate;
+    })
+    .map((order) => ({
+      ...order,
+      customerName: customer.data.name,
+    }));
+
+  const totalLitres = orders.reduce((sum, order) => sum + Number(order.quantityLitres), 0);
+  const totalAmount = orders.reduce((sum, order) => sum + Number(order.amount), 0);
+  const ownerEmails = getOwnerEmails_();
+  const subject = `Milk bill for ${customer.data.name} (${startDate} to ${endDate})`;
+  const body = [
+    `Milk bill for ${customer.data.name}`,
+    `Customer ID: ${customerId}`,
+    `Period: ${startDate} to ${endDate}`,
+    "",
+    `Total litres: ${totalLitres}`,
+    `Total amount: Rs. ${totalAmount}`,
+  ].join("\n");
+  const attachments = [
+    createCsvAttachment_(
+      `bill-${customerId}-${startDate}-to-${endDate}.csv`,
+      buildCustomerBillRows_(orders, customer.data, startDate, endDate)
+    ),
+  ];
+
+  ownerEmails.forEach((email) => {
+    MailApp.sendEmail({
+      to: email,
+      subject,
+      body,
+      attachments,
+    });
+  });
+
+  return {
+    success: true,
+    message: `Bill emailed to owner for ${customer.data.name}.`,
   };
 }
 
@@ -1019,6 +1100,31 @@ function buildMonthlyBillRows_(orders) {
       const total = customerTotals[customerId];
       return [customerId, total.customerName, total.quantityLitres, total.amount];
     }),
+  ];
+}
+
+function buildCustomerBillRows_(orders, customer, startDate, endDate) {
+  const totalLitres = orders.reduce((sum, order) => sum + Number(order.quantityLitres), 0);
+  const totalAmount = orders.reduce((sum, order) => sum + Number(order.amount), 0);
+
+  return [
+    ["Customer Bill"],
+    ["Customer ID", customer.customerId],
+    ["Customer Name", customer.name],
+    ["Start Date", startDate],
+    ["End Date", endDate],
+    [],
+    ["Date", "Brand", "Quantity Litres", "Rate Per Litre", "Amount"],
+    ...orders.map((order) => [
+      dateKey_(order.orderDate),
+      order.brandName,
+      order.quantityLitres,
+      order.ratePerLitre,
+      order.amount,
+    ]),
+    [],
+    ["Total Litres", totalLitres],
+    ["Total Amount", totalAmount],
   ];
 }
 

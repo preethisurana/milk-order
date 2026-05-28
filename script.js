@@ -139,6 +139,7 @@ async function setupOwnerPage() {
 
   await renderOwnerDashboard(session);
   setupCustomerAdmin(session);
+  setupBillGenerator(session);
   await renderCustomers(session);
 }
 
@@ -364,9 +365,11 @@ async function renderCustomers(session) {
 
   if (!response.success || !response.customers || !response.customers.length) {
     customersBody.innerHTML = '<tr><td colspan="4">No customers found.</td></tr>';
+    populateBillCustomerDropdown([]);
     return;
   }
 
+  populateBillCustomerDropdown(response.customers);
   customersBody.innerHTML = response.customers
     .map((customer) => `
       <tr data-customer-id="${escapeHtml(customer.customerId)}">
@@ -384,6 +387,74 @@ async function renderCustomers(session) {
       fillCustomerForm(customer);
     });
   });
+}
+
+function populateBillCustomerDropdown(customers) {
+  const select = document.querySelector("#bill-customer-id");
+
+  if (!select) {
+    return;
+  }
+
+  const activeCustomers = customers.filter((customer) => customer.active);
+  select.innerHTML = '<option value="">Select customer</option>';
+
+  activeCustomers.forEach((customer) => {
+    const option = document.createElement("option");
+    option.value = customer.customerId;
+    option.textContent = `${customer.name} (${customer.customerId})`;
+    select.appendChild(option);
+  });
+}
+
+function setupBillGenerator(session) {
+  const form = document.querySelector("#bill-generator-form");
+
+  if (!form) {
+    return;
+  }
+
+  const today = new Date();
+  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+  document.querySelector("#bill-start-date").value = toDateKey(firstDay);
+  document.querySelector("#bill-end-date").value = toDateKey(today);
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await generateCustomerBill(session);
+  });
+}
+
+async function generateCustomerBill(session) {
+  const customerId = document.querySelector("#bill-customer-id").value;
+  const startDate = document.querySelector("#bill-start-date").value;
+  const endDate = document.querySelector("#bill-end-date").value;
+
+  if (!customerId || !startDate || !endDate) {
+    setMessageById("bill-message", "Select customer, start date, and end date.", "error");
+    return;
+  }
+
+  if (startDate > endDate) {
+    setMessageById("bill-message", "Start date must be before end date.", "error");
+    return;
+  }
+
+  setMessageById("bill-message", "Generating bill email...", "info");
+
+  const response = await apiRequest("generateCustomerBill", {
+    token: session.token,
+    customerId,
+    startDate,
+    endDate,
+  });
+
+  if (!response.success) {
+    setMessageById("bill-message", response.message || "Bill could not be generated.", "error");
+    return;
+  }
+
+  setMessageById("bill-message", response.message || "Bill emailed to owner.", "success");
 }
 
 async function saveCustomer(session) {
@@ -662,6 +733,13 @@ function localApiRequest(action, payload) {
     return Promise.resolve({
       success: true,
       message: "Customer deactivated.",
+    });
+  }
+
+  if (action === "generateCustomerBill") {
+    return Promise.resolve({
+      success: true,
+      message: "Local demo bill generated. Backend mode emails the owner.",
     });
   }
 
