@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Owner Order Details</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <nav class="nav-shell" aria-label="Main navigation">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true">M</span>
+        <span>MilkMate Orders</span>
+      </a>
+
+      <div class="nav-links">
+        <a href="owner.html">Owner Details</a>
+        <a href="index.html" data-logout>Logout</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="page-heading">
+      <p class="eyebrow">Owner page</p>
+      <h1>Check required business details</h1>
+      <p>Review next-day purchase totals, customer orders, and monthly bill summaries.</p>
+    </section>
+
+    <section class="owner-stats" aria-label="Owner summary">
+      <article>
+        <span>Total milk for tomorrow</span>
+        <strong id="owner-total-litres">0 L</strong>
+      </article>
+      <article>
+        <span>Active customer orders</span>
+        <strong id="owner-active-orders">0</strong>
+      </article>
+      <article>
+        <span>Daily report time</span>
+        <strong>10 PM</strong>
+      </article>
+    </section>
+
+    <section class="info-grid">
+      <article class="info-panel">
+        <p class="eyebrow">Next-day orders</p>
+        <h2>Customer-wise list</h2>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Brand</th>
+                <th>Quantity</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody id="owner-orders-body">
+              <tr>
+                <td colspan="4">No customer orders found for tomorrow.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="info-panel">
+        <p class="eyebrow">Purchase summary</p>
+        <h2>Brand-wise totals</h2>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Brand</th>
+                <th>Total litres</th>
+                <th>Rate</th>
+              </tr>
+            </thead>
+            <tbody id="owner-brand-body">
+              <tr>
+                <td colspan="3">No brand totals available yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section class="rules-section">
+      <div class="section-heading">
+        <p class="eyebrow">Customer management</p>
+        <h2>Add, modify, or remove customers</h2>
+      </div>
+
+      <div class="owner-management">
+        <form class="customer-form" id="customer-admin-form">
+          <div class="field">
+            <label for="admin-customer-id">Customer ID</label>
+            <input id="admin-customer-id" name="customerId" type="text" placeholder="Example: CUST002" required />
+          </div>
+
+          <div class="field">
+            <label for="admin-customer-name">Name</label>
+            <input id="admin-customer-name" name="name" type="text" placeholder="Customer name" required />
+          </div>
+
+          <div class="field">
+            <label for="admin-customer-phone">Phone</label>
+            <input id="admin-customer-phone" name="phone" type="tel" placeholder="Phone number" />
+          </div>
+
+          <div class="field">
+            <label for="admin-customer-password">Password</label>
+            <input id="admin-customer-password" name="password" type="password" placeholder="Required for new customer" />
+          </div>
+
+          <div class="field">
+            <label for="admin-customer-active">Status</label>
+            <select id="admin-customer-active" name="active">
+              <option value="TRUE">Active</option>
+              <option value="FALSE">Inactive</option>
+            </select>
+          </div>
+
+          <div class="action-row">
+            <button class="primary-button" type="submit">Save customer</button>
+            <button class="secondary-button" id="clear-customer-form" type="button">Clear</button>
+            <button class="danger-button" id="delete-customer" type="button">Delete customer</button>
+          </div>
+
+          <p class="form-message" id="customer-admin-message" role="status"></p>
+        </form>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Customer ID</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="customers-body">
+              <tr>
+                <td colspan="4">Loading customers...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="app-config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

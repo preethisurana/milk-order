@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer Milk Order</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <nav class="nav-shell" aria-label="Main navigation">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true">M</span>
+        <span>MilkMate Orders</span>
+      </a>
+
+      <div class="nav-links">
+        <a href="customer.html">My Order</a>
+        <a href="index.html" data-logout>Logout</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="page-heading">
+      <p class="eyebrow">Customer page</p>
+      <h1>Enter your milk order details</h1>
+      <p id="customer-greeting">Choose the delivery date, milk brand, and quantity. Orders can be changed before the 9 PM IST cutoff.</p>
+    </section>
+
+    <section class="workspace single-column" aria-label="Customer milk order form">
+      <div class="order-panel">
+        <div class="section-heading">
+          <p class="eyebrow">Order entry</p>
+          <h2>Select date, brand, and quantity</h2>
+        </div>
+
+        <form class="order-grid" id="order-form">
+          <div class="field">
+            <label for="order-date">Delivery date</label>
+            <input id="order-date" name="order-date" type="date" />
+          </div>
+
+          <div class="field">
+            <label for="milk-brand">Milk brand</label>
+            <select id="milk-brand" name="milk-brand">
+              <option value="">Select brand</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="quantity">Quantity</label>
+            <input id="quantity" name="quantity" type="number" min="0.5" step="0.5" placeholder="0.5 L" />
+          </div>
+
+          <div class="rate-box">
+            <span>Selected rate</span>
+            <strong id="selected-rate">Select a brand</strong>
+          </div>
+        </form>
+
+        <div class="order-summary" id="order-summary" aria-label="Selected date order summary">
+          <div>
+            <p class="summary-label">Existing order</p>
+            <strong id="summary-title">No order selected yet</strong>
+            <span id="summary-detail">Selecting a date will show the customer's saved order here.</span>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button class="primary-button" id="save-order" type="submit" form="order-form">Save order</button>
+          <button class="secondary-button" id="modify-order" type="submit" form="order-form">Modify order</button>
+          <button class="danger-button" id="delete-order" type="button">Delete order</button>
+        </div>
+
+        <p class="form-message" id="order-message" role="status"></p>
+      </div>
+    </section>
+
+    <section class="rules-section">
+      <div class="section-heading">
+        <p class="eyebrow">Customer rules</p>
+        <h2>Before placing an order</h2>
+      </div>
+
+      <div class="rules-list">
+        <div>
+          <strong>9 PM IST cutoff</strong>
+          <span>Tomorrow's order can be created, modified, or deleted only before cutoff.</span>
+        </div>
+        <div>
+          <strong>0.5 litre steps</strong>
+          <span>Quantity must be entered as 0.5, 1, 1.5, 2 litres, and so on.</span>
+        </div>
+        <div>
+          <strong>Brand rate shown</strong>
+          <span>The selected brand's rate will be loaded from the owner-maintained sheet later.</span>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="app-config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

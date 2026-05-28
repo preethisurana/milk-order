@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MilkMate Login</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <nav class="nav-shell" aria-label="Main navigation">
+      <a class="brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true">M</span>
+        <span>MilkMate</span>
+      </a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero-section login-hero">
+      <div class="hero-content">
+        <p class="eyebrow">Daily milk order collection</p>
+        <h1>Log in to manage milk orders.</h1>
+        <p class="hero-text">
+          Customers can place daily orders, and the owner can check next-day totals and monthly billing details.
+        </p>
+      </div>
+
+      <aside class="status-panel" aria-label="Order cutoff status">
+        <p class="panel-label">Order cutoff</p>
+        <strong>9:00 PM IST</strong>
+        <span>Tomorrow's orders close at the cutoff time.</span>
+      </aside>
+    </section>
+
+    <section class="login-gateway" aria-label="Login options">
+      <article class="login-panel">
+        <div class="section-heading">
+          <p class="eyebrow">Customer login</p>
+          <h2>Place or change your milk order</h2>
+        </div>
+
+        <form class="form-stack" id="customer-login-form">
+          <label for="customer-id">User ID</label>
+          <input id="customer-id" name="customer-id" type="text" placeholder="Example: CUST001" required />
+
+          <label for="customer-password">Password</label>
+          <input id="customer-password" name="password" type="password" placeholder="Enter password" required />
+
+          <button class="primary-button" type="submit">Customer login</button>
+          <p class="form-message" id="customer-login-message" role="status"></p>
+        </form>
+      </article>
+
+      <article class="login-panel">
+        <div class="section-heading">
+          <p class="eyebrow">Owner login</p>
+          <h2>Check business order details</h2>
+        </div>
+
+        <form class="form-stack" id="owner-login-form">
+          <label for="owner-id">Owner ID</label>
+          <input id="owner-id" name="owner-id" type="text" placeholder="Example: OWNER001" required />
+
+          <label for="owner-password">Password</label>
+          <input id="owner-password" name="password" type="password" placeholder="Enter password" required />
+
+          <button class="secondary-button" type="submit">Owner login</button>
+          <p class="form-message" id="owner-login-message" role="status"></p>
+        </form>
+      </article>
+    </section>
+  </main>
+  <script src="app-config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
