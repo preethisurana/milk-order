@@ -79,6 +79,14 @@ function doPost(e) {
   }
 }
 
+function onEdit(e) {
+  try {
+    hashEditedInitialPassword_(e);
+  } catch (error) {
+    Logger.log(error.message);
+  }
+}
+
 function login_(payload) {
   const role = String(payload.role || "").trim();
   const userId = String(payload.userId || "").trim();
@@ -102,21 +110,23 @@ function login_(payload) {
     };
   }
 
-  if (!account.data.passwordSalt || !account.data.passwordHash) {
+  const preparedAccount = ensureAccountPasswordHash_(sheetName, account);
+
+  if (!preparedAccount.data.passwordSalt || !preparedAccount.data.passwordHash) {
     return {
       success: false,
-      message: "Password hash is not prepared. Run hashInitialPasswords first.",
+      message: "Password hash is not prepared. Add an initial password for this account.",
     };
   }
 
-  if (!verifyPassword_(password, account.data.passwordSalt, account.data.passwordHash)) {
+  if (!verifyPassword_(password, preparedAccount.data.passwordSalt, preparedAccount.data.passwordHash)) {
     return {
       success: false,
       message: "Invalid user ID or password.",
     };
   }
 
-  const session = createSession_(role, account.data);
+  const session = createSession_(role, preparedAccount.data);
 
   return {
     success: true,
@@ -623,6 +633,97 @@ function hashInitialPasswords() {
   return message;
 }
 
+function hashEditedInitialPassword_(e) {
+  if (!e || !e.range) {
+    return;
+  }
+
+  const sheet = e.range.getSheet();
+  const sheetName = sheet.getName();
+  const idColumnName = getAccountIdColumnForSheet_(sheetName);
+
+  if (!idColumnName || e.range.getRow() === 1) {
+    return;
+  }
+
+  const headers = sheet
+    .getRange(1, 1, 1, sheet.getLastColumn())
+    .getValues()[0]
+    .map((header) => String(header).trim());
+  const startRow = e.range.getRow();
+  const endRow = startRow + e.range.getNumRows() - 1;
+
+  for (let rowNumber = startRow; rowNumber <= endRow; rowNumber += 1) {
+    hashInitialPasswordForRow_(sheet, headers, rowNumber, idColumnName, true);
+  }
+}
+
+function ensureAccountPasswordHash_(sheetName, account) {
+  const idColumnName = getAccountIdColumnForSheet_(sheetName);
+  if (!idColumnName) {
+    return account;
+  }
+
+  let updated = false;
+
+  if (account.data.initialPassword) {
+    const table = readRows_(sheetName);
+    updated = hashInitialPasswordForRow_(
+      table.sheet,
+      table.headers.map((header) => String(header).trim()),
+      account.rowNumber,
+      idColumnName,
+      true
+    );
+  }
+
+  if (!updated) {
+    return account;
+  }
+
+  return findRowByValue_(sheetName, idColumnName, account.data[idColumnName]) || account;
+}
+
+function hashInitialPasswordForRow_(sheet, headers, rowNumber, idColumnName, replaceExistingHash) {
+  const idIndex = getHeaderIndex_(headers, idColumnName);
+  const initialPasswordIndex = getHeaderIndex_(headers, "initialPassword");
+  const passwordSaltIndex = getHeaderIndex_(headers, "passwordSalt");
+  const passwordHashIndex = getHeaderIndex_(headers, "passwordHash");
+  const row = sheet.getRange(rowNumber, 1, 1, headers.length).getValues()[0];
+  const accountId = String(row[idIndex] || "").trim();
+  const initialPassword = String(row[initialPasswordIndex] || "").trim();
+  const existingSalt = String(row[passwordSaltIndex] || "").trim();
+  const existingHash = String(row[passwordHashIndex] || "").trim();
+
+  if (!accountId || !initialPassword) {
+    return false;
+  }
+
+  if (!replaceExistingHash && existingSalt && existingHash) {
+    return false;
+  }
+
+  const salt = Utilities.getUuid();
+  const passwordHash = hashPassword_(initialPassword, salt);
+
+  sheet.getRange(rowNumber, initialPasswordIndex + 1).setValue("");
+  sheet.getRange(rowNumber, passwordSaltIndex + 1).setValue(salt);
+  sheet.getRange(rowNumber, passwordHashIndex + 1).setValue(passwordHash);
+  return true;
+}
+
+function getAccountIdColumnForSheet_(sheetName) {
+  if (sheetName === CONFIG.sheets.customers) {
+    return "customerId";
+  }
+
+  if (sheetName === CONFIG.sheets.owners) {
+    return "ownerId";
+  }
+
+  return "";
+}
+
 function syncOrderCustomerNames() {
   const customerNames = getCustomerNameMap_();
   const table = readRows_(CONFIG.sheets.orders);
@@ -718,6 +819,24 @@ function installReportTriggers() {
     .nearMinute(0)
     .inTimezone(CONFIG.timezone)
     .create();
+}
+
+function installAccountHashTrigger() {
+  const existingTrigger = ScriptApp.getProjectTriggers().some((trigger) => {
+    return trigger.getHandlerFunction() === "onEdit" &&
+      trigger.getEventType() === ScriptApp.EventType.ON_EDIT;
+  });
+
+  if (existingTrigger) {
+    return "Account hash edit trigger already installed.";
+  }
+
+  ScriptApp.newTrigger("onEdit")
+    .forSpreadsheet(getSpreadsheet_())
+    .onEdit()
+    .create();
+
+  return "Account hash edit trigger installed.";
 }
 
 function parsePayload_(e) {
