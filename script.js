@@ -358,6 +358,14 @@ function setupCustomerAdmin(session) {
     return;
   }
 
+  [0, 300, 1000].forEach((delay) => {
+    window.setTimeout(() => {
+      if (!form.contains(document.activeElement)) {
+        clearCustomerForm();
+      }
+    }, delay);
+  });
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     await saveCustomer(session);

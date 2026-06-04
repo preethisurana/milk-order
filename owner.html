@@ -97,25 +97,25 @@
       </div>
 
       <div class="owner-management">
-        <form class="customer-form" id="customer-admin-form">
+        <form class="customer-form" id="customer-admin-form" autocomplete="off">
           <div class="field">
             <label for="admin-customer-id">Customer ID</label>
-            <input id="admin-customer-id" name="customerId" type="text" placeholder="Example: CUST002" required />
+            <input id="admin-customer-id" name="adminCustomerId" type="text" placeholder="Example: CUST002" autocomplete="off" required />
           </div>
 
           <div class="field">
             <label for="admin-customer-name">Name</label>
-            <input id="admin-customer-name" name="name" type="text" placeholder="Customer name" required />
+            <input id="admin-customer-name" name="adminCustomerName" type="text" placeholder="Customer name" autocomplete="off" required />
           </div>
 
           <div class="field">
             <label for="admin-customer-phone">Phone</label>
-            <input id="admin-customer-phone" name="phone" type="tel" placeholder="Phone number" />
+            <input id="admin-customer-phone" name="adminCustomerPhone" type="tel" placeholder="Phone number" autocomplete="off" />
           </div>
 
           <div class="field">
             <label for="admin-customer-password">Password</label>
-            <input id="admin-customer-password" name="password" type="password" placeholder="Required for new customer" />
+            <input id="admin-customer-password" name="adminCustomerNewPassword" type="password" placeholder="Required for new customer" autocomplete="new-password" />
           </div>
 
           <div class="field">
