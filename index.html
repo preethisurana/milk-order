@@ -40,12 +40,12 @@
           <h2>Place or change your milk order</h2>
         </div>
 
-        <form class="form-stack" id="customer-login-form">
+        <form class="form-stack" id="customer-login-form" autocomplete="off">
           <label for="customer-id">User ID</label>
-          <input id="customer-id" name="customer-id" type="text" placeholder="Example: CUST001" required />
+          <input id="customer-id" name="customerUserId" type="text" placeholder="Example: CUST001" autocomplete="off" required />
 
           <label for="customer-password">Password</label>
-          <input id="customer-password" name="password" type="password" placeholder="Enter password" required />
+          <input id="customer-password" name="customerPassword" type="password" placeholder="Enter password" autocomplete="new-password" required />
 
           <button class="primary-button" type="submit">Customer login</button>
           <p class="form-message" id="customer-login-message" role="status"></p>
@@ -58,12 +58,12 @@
           <h2>Check business order details</h2>
         </div>
 
-        <form class="form-stack" id="owner-login-form">
+        <form class="form-stack" id="owner-login-form" autocomplete="off">
           <label for="owner-id">Owner ID</label>
-          <input id="owner-id" name="owner-id" type="text" placeholder="Example: OWNER001" required />
+          <input id="owner-id" name="ownerUserId" type="text" placeholder="Example: OWNER001" autocomplete="off" required />
 
           <label for="owner-password">Password</label>
-          <input id="owner-password" name="password" type="password" placeholder="Enter password" required />
+          <input id="owner-password" name="ownerPassword" type="password" placeholder="Enter password" autocomplete="new-password" required />
 
           <button class="secondary-button" type="submit">Owner login</button>
           <p class="form-message" id="owner-login-message" role="status"></p>

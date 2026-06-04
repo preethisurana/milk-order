@@ -23,6 +23,11 @@ function setupLoginPage() {
   const customerForm = document.querySelector("#customer-login-form");
   const ownerForm = document.querySelector("#owner-login-form");
 
+  if (customerForm || ownerForm) {
+    clearLoginForms();
+    window.addEventListener("pageshow", clearLoginForms);
+  }
+
   if (customerForm) {
     customerForm.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -147,8 +152,16 @@ function setupLogoutLinks() {
   document.querySelectorAll("[data-logout]").forEach((link) => {
     link.addEventListener("click", () => {
       localStorage.removeItem(STORAGE_KEYS.session);
+      clearLoginForms();
     });
   });
+}
+
+function clearLoginForms() {
+  document.querySelector("#customer-login-form")?.reset();
+  document.querySelector("#owner-login-form")?.reset();
+  setMessageById("customer-login-message", "", "");
+  setMessageById("owner-login-message", "", "");
 }
 
 async function loadConfig(session) {
